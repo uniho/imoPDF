@@ -22,6 +22,8 @@ type
     ExecPath: string;
     procedure Doing(const filename: string);
     procedure AfterShow(Data: PtrInt);
+    procedure BeforeDoing;
+    procedure AfterDoing;
   public
     { public declarations }
   end;
@@ -55,11 +57,11 @@ procedure TForm1.FormDropFiles(Sender: TObject; const FileNames: array of String
 var
   s: string;
 begin
+  BeforeDoing;
   for s in FileNames do begin
     Doing(s);
   end;
-  Windows.MessageBeep(0);
-  Close;
+  AfterDoing;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
@@ -75,12 +77,25 @@ var
   i: integer;
 begin
   if ParamCount > 0 then begin
+    BeforeDoing;
     for i:=1 to ParamCount do begin
       Doing(ParamStr(i));
     end;
-    Windows.MessageBeep(0);
-    Close;
+    AfterDoing;
   end;
+end;
+
+procedure TForm1.BeforeDoing;
+begin
+  FormStyle:=fsNormal;
+  BorderIcons:=BorderIcons+[biMinimize];
+end;
+
+procedure TForm1.AfterDoing;
+begin
+  Label1.Caption:=#$0d#$0d'処理が終了しました。';
+  Windows.MessageBeep(0);
+  Close;
 end;
 
 procedure TForm1.Doing(const filename: string);
@@ -120,7 +135,7 @@ begin
       sl.Free;
     end;
   except
-    Label1.Caption:='エラーが発生しました';
+    Label1.Caption:=#$0d#$0d'エラーが発生しました';
   end;
 end;
 
